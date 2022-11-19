@@ -5,7 +5,7 @@ class Main:
 
     def __init__(self):
 
-        self.window = pygame.display.set_mode([360, 640])
+        self.window = pygame.display.set_mode([1280, 640])
         pygame.display.set_caption("Fraco Bird")
         pygame.display.set_icon(pygame.transform.scale(pygame.image.load("assets/bird1_.png"), (555, 555)))
 
