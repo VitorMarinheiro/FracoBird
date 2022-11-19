@@ -33,7 +33,7 @@ class Game:
         self.pipes1_list.append(self.pipe)
         self.pipes2_list.append(self.pipe2)
 
-        self.score = Text(100, "0")
+        self.score = Text(70, "0")
 
         self.ticks = 0
 

@@ -119,11 +119,11 @@ class Text:
 
     def __init__(self, size, text):
         pygame.font.init()
-        self.font = pygame.font.Font("assets/font/font.ttf", size)
-        self.render = self.font.render(text, True, (255, 255, 255))
+        self.font = pygame.font.Font("assets/font/flappy-bird-font.ttf", size)
+        self.render = self.font.render(text, True, (0, 0, 0))
 
     def draw(self, window, x, y):
         window.blit(self.render, (x, y))
 
     def text_update(self, text):
-        self.render = self.font.render(text, True, (255, 255, 255))
+        self.render = self.font.render(text, True, (0, 0, 0))
