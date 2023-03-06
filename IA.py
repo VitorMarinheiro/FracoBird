@@ -14,13 +14,13 @@ class Layer_Dense:
 
     def randomWeights(self):
         for i in range(0, len(self.weights)):
-            rand = random.randint(0, 5)
+            rand = random.randint(0, 3)
             if rand == 0:      # Valor Aleatorio
-                self.weights[i] = random.uniform(-0.1, 0.1)
+                self.weights[i] = random.uniform(-1, 1)
             elif rand == 1:    # Multiplicacao Aleatoria
-                self.weights[i] *= random.uniform(0.9, 1.1)
+                self.weights[i] *= random.uniform(0.2, 1.2)
             elif rand == 2:    # Soma Aleatoria
-                self.weights[i] += random.uniform(-0.01, 0.01)
+                self.weights[i] += random.uniform(-0.5, 0.5)
 
 
     def forward(self, inputs):

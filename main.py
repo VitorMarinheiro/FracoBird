@@ -7,7 +7,7 @@ class Main:
 
         self.window = pygame.display.set_mode([1280, 640])
         pygame.display.set_caption("Fraco Bird")
-        pygame.display.set_icon(pygame.transform.scale(pygame.image.load("assets/bird1_.png"), (555, 555)))
+        pygame.display.set_icon(pygame.transform.scale(pygame.image.load("assets/bird0_2.png"), (555, 555)))
 
         self.loop = True
         self.fps = pygame.time.Clock()
@@ -25,7 +25,7 @@ class Main:
 
     def update(self):
         while self.loop:
-            self.fps.tick(120)
+            self.fps.tick(60)
             self.events()
             self.draw()
             pygame.display.update()

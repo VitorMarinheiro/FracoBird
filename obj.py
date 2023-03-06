@@ -1,6 +1,7 @@
 import pygame
-import copy
-
+import numpy as np
+import pygame.gfxdraw
+import random
 
 class Obj(pygame.sprite.Sprite):
 
@@ -30,26 +31,6 @@ class Pipe(Obj):
             self.kill()
 
 
-class Coin(Obj):
-
-    def __init__(self, img, x, y, *groups):
-        super().__init__(img, x, y, *groups)
-
-        self.ticks = 0
-        self.vel = 4
-
-    def update(self, *args):
-        self.move()
-        self.anim()
-
-    def move(self):
-        self.rect[0] -= self.vel
-
-    def anim(self):
-        self.ticks = (self.ticks + 1) % 6  # Vai fazer isso 6x depois voltar para 0
-        self.image = pygame.image.load("assets/" + str(self.ticks) + ".png")
-
-
 class Bird(pygame.sprite.Sprite):
 
     def __init__(self, img, *groups):
@@ -58,20 +39,21 @@ class Bird(pygame.sprite.Sprite):
         self.image = pygame.image.load(img)
         self.rect = self.image.get_rect()
         self.rect[0] = 50
-        self.rect[1] = 120
+        self.rect[1] = 220
         self.ticks = 0
         self.vel = -8
         self.velHorizontal = 0
-        self.grav = 2
+        self.grav = 1
         self.pts = 0
         self.distTop = 0
         self.distBottom = 0
         self.distXToPipes = 0
+        self.distHole = 0
         self.play = True
         self.fitness = 0
 
     def copy(self):
-        new_bird = Bird("assets/bird0.png", self.groups())
+        new_bird = Bird("assets/bird0_0.png", self.groups())
         new_bird.rect = self.rect.copy()
         new_bird.ticks = self.ticks
         new_bird.vel = self.vel
@@ -96,7 +78,7 @@ class Bird(pygame.sprite.Sprite):
 
     def anim(self):
         self.ticks = (self.ticks + 1) % 4  # Vai fazer isso 6x depois voltar para 0
-        self.image = pygame.image.load("assets/bird" + str(self.ticks) + ".png")
+        self.image = pygame.image.load("assets/bird0_" + str(self.ticks) + ".png")
 
     def move(self):
 
@@ -138,8 +120,7 @@ class Bird(pygame.sprite.Sprite):
         if pygame.sprite.spritecollide(self, group, False):
             self.play = False
             self.velHorizontal = -4
-            self.image = pygame.transform.rotate(self.image, 270)
-            self.fitness -= 10
+            self.fitness -= 20
 
     def collision_sky(self):
 
@@ -148,30 +129,26 @@ class Bird(pygame.sprite.Sprite):
             self.image = pygame.transform.rotate(self.image, 270)
             self.vel = 1
             self.velHorizontal = -4
-            self.fitness -= 10
-
-    def collision_coin(self, group):
-
-        if pygame.sprite.spritecollide(self, group, True):
-            self.pts += 1
-            self.fitness += 50
+            self.fitness -= 20
 
     def getDistance(self, pipesTop_List, pipesBottom_List):
         if self.play:
             actualPipe = 0
             if self.play and len(pipesTop_List) > 0:
-                if pipesTop_List[0].rect[0] + 48 < self.rect[0]:
+                if pipesTop_List[0].rect[0] + 96 < self.rect[0]:
                     actualPipe = 1
+                    self.pts += 1
                 self.distTop = (pipesTop_List[actualPipe].rect[1] + 358 - self.rect[1])
                 self.distBottom = (pipesBottom_List[actualPipe].rect[1] - self.rect[1])
+                self.distHole = (pipesBottom_List[actualPipe].rect[1] - 100 - self.rect[1])
                 self.distXToPipes = (pipesBottom_List[actualPipe].rect[0] - self.rect[0])
 
 
 class Text:
 
-    def __init__(self, size, text):
+    def __init__(self, size, text, font):
         pygame.font.init()
-        self.font = pygame.font.Font("assets/font/flappy-bird-font.ttf", size)
+        self.font = pygame.font.Font("assets/font/"+font+".ttf", size)
         self.render = self.font.render(text, True, (0, 0, 0))
 
     def draw(self, window, x, y):
@@ -179,3 +156,49 @@ class Text:
 
     def text_update(self, text):
         self.render = self.font.render(text, True, (0, 0, 0))
+
+
+class Chart:
+
+    def __init__(self, x, y, height, width):
+
+        self.x = x
+        self.y = y
+        self.height = height
+        self.width = width
+        self.chart_surface = None
+
+    def update(self, generation, histY):
+
+        generation -= 1
+        if len(histY) > 0:
+            # Generate random data points
+            x = np.random.randint(1, 10, size=generation)
+            y = histY
+
+            # Calculate the maximum Y value
+            max_y = max(y)
+
+            if max_y > 0:
+                # Draw the chart on a surface
+                self.chart_surface = pygame.Surface((self.width, self.height))
+                self.chart_surface.fill((223, 216, 148))
+
+                for i in range(len(x) - 1):
+                    x1 = round((i * self.width) / generation)
+                    y1 = int(100 - (y[i] / max_y) * 80)
+                    x2 = round(((i + 1) * self.width) / generation)
+                    y2 = int(100 - (y[i + 1] / max_y) * 80)
+                    pygame.gfxdraw.line(self.chart_surface, x1, y1, x2, y2, (0, 0, 0))
+
+                # Draw a circle at each data point
+                for i in range(len(x)):
+                    x_pos = round((i * self.width) / generation)
+                    y_pos = int(100 - (y[i] / max_y) * 80)
+                    pygame.draw.circle(self.chart_surface, (255, 0, 0), (x_pos, y_pos), 3)
+
+    def draw(self, window):
+
+        if self.chart_surface is not None:
+            # Blit the chart surface onto the main pygame window
+            window.blit(self.chart_surface, (self.x, self.y))
