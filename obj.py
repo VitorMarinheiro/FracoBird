@@ -1,7 +1,8 @@
+import random
 import pygame
 import numpy as np
 import pygame.gfxdraw
-import random
+
 
 class Obj(pygame.sprite.Sprite):
 
@@ -36,6 +37,7 @@ class Bird(pygame.sprite.Sprite):
     def __init__(self, img, *groups):
         super().__init__(*groups)
 
+        self.imgPicker = str(random.randint(0,3))
         self.image = pygame.image.load(img)
         self.rect = self.image.get_rect()
         self.rect[0] = 50
@@ -53,7 +55,7 @@ class Bird(pygame.sprite.Sprite):
         self.fitness = 0
 
     def copy(self):
-        new_bird = Bird("assets/bird0_0.png", self.groups())
+        new_bird = Bird("assets/bird"+self.imgPicker+"_0.png", self.groups())
         new_bird.rect = self.rect.copy()
         new_bird.ticks = self.ticks
         new_bird.vel = self.vel
@@ -78,7 +80,7 @@ class Bird(pygame.sprite.Sprite):
 
     def anim(self):
         self.ticks = (self.ticks + 1) % 4  # Vai fazer isso 6x depois voltar para 0
-        self.image = pygame.image.load("assets/bird0_" + str(self.ticks) + ".png")
+        self.image = pygame.image.load("assets/bird"+self.imgPicker+"_" + str(self.ticks) + ".png")
 
     def move(self):
 
@@ -195,7 +197,7 @@ class Chart:
                 for i in range(len(x)):
                     x_pos = round((i * self.width) / generation)
                     y_pos = int(100 - (y[i] / max_y) * 80)
-                    pygame.draw.circle(self.chart_surface, (255, 0, 0), (x_pos, y_pos), 3)
+                    pygame.draw.circle(self.chart_surface, (0, 45, 180), (x_pos, y_pos), 3)
 
     def draw(self, window):
 

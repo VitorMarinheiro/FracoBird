@@ -11,7 +11,7 @@ class Game:
 
     def __init__(self):
 
-        self.tamPopulation = 1000
+        self.tamPopulation = 600
         self.generation = 0
         self.bestScore = 0
         self.score = 0
@@ -185,7 +185,7 @@ class Game:
                     self.pipesTop_list.remove(pipe)
 
         # de 1,5 seggundo em segundo
-        if self.ticks >= 75:
+        if self.ticks >= 60:
             self.ticks = 0
             self.createPipe()
 
