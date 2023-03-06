@@ -25,7 +25,7 @@ class Main:
 
     def update(self):
         while self.loop:
-            self.fps.tick(30)
+            self.fps.tick(120)
             self.events()
             self.draw()
             pygame.display.update()
