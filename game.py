@@ -11,7 +11,7 @@ class Game:
 
     def __init__(self):
 
-        self.tamPopulation = 600
+        self.tamPopulation = 500
         self.generation = 0
         self.bestScore = 0
         self.score = 0
@@ -57,7 +57,7 @@ class Game:
                     vivos += 1
                     bird.getDistance(self.pipesTop_list, self.pipesBottom_list)
 
-                    bird.dense1.forward(np.array([bird.distTop, bird.distBottom, bird.distXToPipes, bird.rect[1]]))
+                    bird.dense1.forward(np.array([bird.distTop, bird.distBottom, bird.distXToPipes, bird.rect[1], bird.distTopSecondPipe, bird.distBottomSecondPipe, bird.distXToPipesSecondPipe]))
                     bird.dense2.forward(self.ReLU.forward(bird.dense1.output))
                     if self.ReLU.forward(bird.dense2.output) > 0:
                         bird.jump()
@@ -116,8 +116,8 @@ class Game:
 
         for indexPopulation in range(0, self.tamPopulation):
             newBird = Bird("assets/bird0_0.png", self.bird_group)
-            newBird.dense1 = Layer_Dense(4, 2)
-            newBird.dense2 = Layer_Dense(2, 1)
+            newBird.dense1 = Layer_Dense(7, 6)
+            newBird.dense2 = Layer_Dense(6, 1)
             if len(listOfBirds) > 0:
                 newBird.dense1.weights = listOfBirds[0].dense1.weights.copy()
                 newBird.dense2.weights = listOfBirds[0].dense2.weights.copy()

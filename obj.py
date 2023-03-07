@@ -50,6 +50,9 @@ class Bird(pygame.sprite.Sprite):
         self.distTop = 0
         self.distBottom = 0
         self.distXToPipes = 0
+        self.distTopSecondPipe = 0
+        self.distBottomSecondPipe = 0
+        self.distXToPipesSecondPipe = 0
         self.distHole = 0
         self.play = True
         self.fitness = 0
@@ -65,6 +68,10 @@ class Bird(pygame.sprite.Sprite):
         new_bird.distTop = self.distTop
         new_bird.distBottom = self.distBottom
         new_bird.distXToPipes = self.distXToPipes
+        new_bird.distTopSecondPipe = self.distTopSecondPipe
+        new_bird.distBottomSecondPipe = self.distBottomSecondPipe
+        new_bird.distXToPipesSecondPipe = self.distXToPipesSecondPipe
+        new_bird.distHole = self.distHole
         new_bird.play = self.play
         new_bird.fitness = self.fitness
         return new_bird
@@ -142,8 +149,16 @@ class Bird(pygame.sprite.Sprite):
                     self.pts += 1
                 self.distTop = (pipesTop_List[actualPipe].rect[1] + 358 - self.rect[1])
                 self.distBottom = (pipesBottom_List[actualPipe].rect[1] - self.rect[1])
-                self.distHole = (pipesBottom_List[actualPipe].rect[1] - 100 - self.rect[1])
                 self.distXToPipes = (pipesBottom_List[actualPipe].rect[0] - self.rect[0])
+                self.distHole = (pipesBottom_List[actualPipe].rect[1] - 100 - self.rect[1])
+                if len(pipesTop_List) > 1:
+                    self.distTopSecondPipe = (pipesTop_List[actualPipe+1].rect[1] + 358 - self.rect[1])
+                    self.distBottomSecondPipe = (pipesBottom_List[actualPipe+1].rect[1] - self.rect[1])
+                    self.distXToPipesSecondPipe = (pipesBottom_List[actualPipe+1].rect[0] - self.rect[0])
+                else:
+                    self.distTopSecondPipe = 0
+                    self.distBottomSecondPipe = 0
+                    self.distXToPipesSecondPipe = 1280
 
 
 class Text:
