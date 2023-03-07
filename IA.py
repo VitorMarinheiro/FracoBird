@@ -17,10 +17,10 @@ class Layer_Dense:
             rand = random.randint(0, 3)
             if rand == 0:
                 # Soma Aleatoria
-                self.weights[i] += random.uniform(-0.1, 0.1)
+                self.weights[i] += random.uniform(-0.3, 0.3)
             elif rand == 1:
                 # Multiplicacao Aleatoria
-                self.weights[i] *= random.uniform(0.9, 1.1)
+                self.weights[i] *= random.uniform(0.7, 1.3)
             # elif rand == 2:
             #     # Valor Aleatorio
             #     self.weights[i] = random.uniform(-1, 1)
