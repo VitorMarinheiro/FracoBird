@@ -1,5 +1,5 @@
 # Fraco Bird
-Projeto de desenvolvimento de um jogo similar ao [FlappyBird](https://flappybird.io/) utilizando a biblioteca [PyGame](https://www.pygame.org/news) do Python que serve como base para implementação de uma **Rede Neural Artificial** criada para aprender a jogar o próprio jogo. 
+Projeto de desenvolvimento de uma **Rede Neural Artificial** criada para aprender a jogar o jogo [FlappyBird](https://flappybird.io/) utilizando a biblioteca [PyGame](https://www.pygame.org/news) do Python. 
 
 ![](https://github.com/VitorMarinheiro/FracoBird/blob/main/assets/running.gif)
 
