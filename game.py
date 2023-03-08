@@ -27,6 +27,8 @@ class Game:
         self.ticks = 0
         self.re_lu = ActivationReLu()
         self.hist_y = []
+        self.all_dead = False
+        self.count_dead_time = 0
 
     def draw(self, window):
         self.window = window
@@ -76,13 +78,21 @@ class Game:
                                     self.best_score = self.score
         else:
 
-            max_attr = max(self.population, key=attrgetter('fitness'))
-            self.hist_y.append(self.score + 1)
-            self.population[0] = max_attr
-            self.start_game(self.population)
-            self.ticks = 0
-            self.graph.update(self.generation, self.hist_y)
-            self.score = 0
+            # Delay para mostrar animacao de ultimo morto
+            self.all_dead = True
+            self.count_dead_time += 1
+
+            # Reseta game apos delay
+            if self.count_dead_time > 20:
+                max_attr = max(self.population, key=attrgetter('fitness'))
+                self.hist_y.append(self.score + 1)
+                self.population[0] = max_attr
+                self.start_game(self.population)
+                self.ticks = 0
+                self.graph.update(self.generation, self.hist_y)
+                self.score = 0
+                self.count_dead_time = 0
+                self.all_dead = False
 
         # Update sprites
         self.ground_group.update()
