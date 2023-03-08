@@ -1,46 +1,48 @@
-import numpy as np
-
-from IA import Layer_Dense, Activation_ReLU
-from obj import Obj, Pipe, Bird, Text, Chart
 from operator import attrgetter
-import pygame
 import random
+import pygame
+import numpy as np
+from ia import LayerDense, ActivationReLu
+from obj import Obj, Pipe, Bird, Text, Chart, Button
 
 
 class Game:
 
     def __init__(self):
 
-        self.tamPopulation = 500
+        self.window = 0
+        self.tam_population = 70
         self.generation = 0
-        self.bestScore = 0
+        self.best_score = 0
         self.score = 0
-        self.startGame([])
-        self.scoreValue = 0
-        self.textScore = Text(70, str(self.scoreValue), "flappy-bird-font")
-        self.textGeneration = Text(15, "", "OpenSans-Regular")
-        self.textPopulation = Text(15, "", "OpenSans-Regular")
-        self.textBestScore = Text(15, "", "OpenSans-Regular")
-        self.textScoreHist = Text(15, "HISTÓRICO DE PONTUAÇÃO", "OpenSans-Regular")
+        self.start_game([])
+        self.score_value = 0
+        self.text_score = Text(70, str(self.score_value), "flappy-bird-font")
+        self.text_generation = Text(15, "", "OpenSans-Regular")
+        self.text_population = Text(15, "", "OpenSans-Regular")
+        self.text_best_score = Text(15, "", "OpenSans-Regular")
+        self.text_score_hist = Text(15, "HISTÓRICO DE PONTUAÇÃO", "OpenSans-Regular")
         self.graph = Chart(350, 510, 100, 500)
         self.playing = True
         self.ticks = 0
-        self.ReLU = Activation_ReLU()
-        self.histY = []
+        self.re_lu = ActivationReLu()
+        self.hist_y = []
 
     def draw(self, window):
+        self.window = window
         self.background.draw(window)
         self.pipe_group.draw(window)
         self.bird_group.draw(window)
         self.ground_group.draw(window)
-        self.textScore.draw(window, 620, 50)
-        self.textGeneration.draw(window, 10, 570)
-        self.textPopulation.draw(window, 10, 590)
-        self.textBestScore.draw(window, 10, 610)
-        self.textScoreHist.draw(window, 500, 610)
+        self.text_score.draw(window, 620, 50)
+        self.text_generation.draw(window, 10, 570)
+        self.text_population.draw(window, 10, 590)
+        self.text_best_score.draw(window, 10, 610)
+        self.text_score_hist.draw(window, 500, 610)
         self.graph.draw(window)
+        self.button.draw(window)
 
-    def validatePopulationAlive(self):
+    def validate_population_alive(self):
         for bird in self.population:
             if bird.play:
                 return True
@@ -48,18 +50,17 @@ class Game:
 
     def update(self):
         vivos = 0
-        if self.validatePopulationAlive():
+        if self.validate_population_alive():
             self.spawn_pipes()
             self.move_ground()
             self.move_bg()
             for bird in self.population:
                 if bird.play:
                     vivos += 1
-                    bird.getDistance(self.pipesTop_list, self.pipesBottom_list)
-
-                    bird.dense1.forward(np.array([bird.distTop, bird.distBottom, bird.distXToPipes, bird.rect[1], bird.distTopSecondPipe, bird.distBottomSecondPipe, bird.distXToPipesSecondPipe]))
-                    bird.dense2.forward(self.ReLU.forward(bird.dense1.output))
-                    if self.ReLU.forward(bird.dense2.output) > 0:
+                    bird.getDistance(self.pipes_top_list, self.pipes_bottom_list, self.window)
+                    bird.dense1.forward(np.array([bird.distTop, bird.distBottom, bird.distXToPipes]))
+                    bird.dense2.forward(self.re_lu.forward(bird.dense1.output))
+                    if self.re_lu.forward(bird.dense2.output) > 0:
                         bird.jump()
 
                     bird.collision_ground(self.ground_group)
@@ -71,28 +72,34 @@ class Game:
                         if bird.play:
                             if bird.pts > self.score:
                                 self.score = bird.pts
-                                if self.score > self.bestScore:
-                                    self.bestScore = self.score
+                                if self.score > self.best_score:
+                                    self.best_score = self.score
         else:
 
             max_attr = max(self.population, key=attrgetter('fitness'))
-            self.histY.append(self.score+1)
+            self.hist_y.append(self.score + 1)
             self.population[0] = max_attr
-            self.startGame(self.population)
+            self.start_game(self.population)
             self.ticks = 0
-            self.graph.update(self.generation, self.histY)
+            self.graph.update(self.generation, self.hist_y)
             self.score = 0
 
         # Update sprites
         self.ground_group.update()
         self.pipe_group.update()
         self.bird_group.update()
-        self.textScore.text_update(str(self.score))
-        self.textPopulation.text_update("Indivíduos Vivos: "+str(vivos))
-        self.textGeneration.text_update("Geração: "+str(self.generation))
-        self.textBestScore.text_update("Melhor Pontuação: "+str(self.bestScore))
+        self.text_score.text_update(str(self.score))
+        self.text_population.text_update("Indivíduos Vivos: " + str(vivos))
+        self.text_generation.text_update("Geração: " + str(self.generation))
+        self.text_best_score.text_update("Melhor Pontuação: " + str(self.best_score))
 
-    def startGame(self, listOfBirds):
+        # Captura eventos de clique
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+            self.button.handle_event(event)
+
+    def start_game(self, listOfBirds):
         self.generation += 1
 
         self.background = pygame.sprite.Group()
@@ -111,29 +118,31 @@ class Game:
         self.ground4 = Obj("assets/ground.png", 1080, 480, self.ground_group)
         self.ground5 = Obj("assets/ground.png", 1440, 480, self.ground_group)
 
-        # reseta a populacao
-        newPopulation = []
+        self.button = Button(900, 525, 150, 50, "GRADES")
 
-        for indexPopulation in range(0, self.tamPopulation):
-            newBird = Bird("assets/bird0_0.png", self.bird_group)
-            newBird.dense1 = Layer_Dense(7, 6)
-            newBird.dense2 = Layer_Dense(6, 1)
+        # Reseta a populacao
+        new_population = []
+
+        for index_population in range(0, self.tam_population):
+            new_bird = Bird("assets/bird0_0.png", self.bird_group)
+            new_bird.dense1 = LayerDense(3, 6)
+            new_bird.dense2 = LayerDense(6, 1)
             if len(listOfBirds) > 0:
-                newBird.dense1.weights = listOfBirds[0].dense1.weights.copy()
-                newBird.dense2.weights = listOfBirds[0].dense2.weights.copy()
-            newPopulation.append(newBird)
+                new_bird.dense1.weights = listOfBirds[0].dense1.weights.copy()
+                new_bird.dense2.weights = listOfBirds[0].dense2.weights.copy()
+            new_population.append(new_bird)
 
         # Aplica mutacao
-        for index in range(0, self.tamPopulation):
+        for index in range(0, self.tam_population):
             if (len(listOfBirds) > 0) and (index > 0):
-                newPopulation[index].dense1.randomWeights()
-                newPopulation[index].dense2.randomWeights()
+                new_population[index].dense1.random_weights()
+                new_population[index].dense2.random_weights()
 
-        self.population = newPopulation[:]
-        self.pipesTop_list = []
-        self.pipesBottom_list = []
+        self.population = new_population[:]
+        self.pipes_top_list = []
+        self.pipes_bottom_list = []
         self.coin_list = []
-        self.createPipe()
+        self.create_pipe()
 
     def move_bg(self):
         self.bg.rect[0] -= 1
@@ -178,19 +187,20 @@ class Game:
 
         self.ticks += 1
 
-        # Remove pipes mortos
+        # Remove pipes mortos da lista de pipesTop e pipesBottom
         if self.ticks >= 1:
-            for pipe in self.pipesTop_list:
-                if pipe.rect[0] <= -50:
-                    self.pipesTop_list.remove(pipe)
+            for i, pipe in enumerate(self.pipes_top_list):
+                if pipe.rect[0] <= -100:
+                    self.pipes_top_list.pop(i)
+                    self.pipes_bottom_list.pop(i)
 
         # de 1,5 seggundo em segundo
         if self.ticks >= 60:
             self.ticks = 0
-            self.createPipe()
+            self.create_pipe()
 
-    def createPipe(self):
-        self.pipeBottom = Pipe("assets/pipe1.png", 1280, random.randrange(250, 430), self.pipe_group)
-        self.pipeTop = Pipe("assets/pipe2.png", 1280, self.pipeBottom.rect[1] - 510, self.pipe_group)
-        self.pipesTop_list.append(self.pipeTop)
-        self.pipesBottom_list.append(self.pipeBottom)
+    def create_pipe(self):
+        self.pipe_bottom = Pipe("assets/pipe1.png", 1280, random.randrange(250, 430), self.pipe_group)
+        self.pipe_top = Pipe("assets/pipe2.png", 1280, self.pipe_bottom.rect[1] - 510, self.pipe_group)
+        self.pipes_top_list.append(self.pipe_top)
+        self.pipes_bottom_list.append(self.pipe_bottom)
