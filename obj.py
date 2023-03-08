@@ -3,7 +3,8 @@ import pygame
 import numpy as np
 import pygame.gfxdraw
 
-showGrades = False
+showGrades1 = False
+showGrades2 = False
 
 
 class Obj(pygame.sprite.Sprite):
@@ -38,7 +39,7 @@ class Bird(pygame.sprite.Sprite):
     def __init__(self, img, *groups):
         super().__init__(*groups)
 
-        self.imgPicker = str(random.randint(0,3))
+        self.imgPicker = str(random.randint(0, 3))
         self.image = pygame.image.load(img)
         self.rect = self.image.get_rect()
         self.rect[0] = random.randint(50, 250)
@@ -143,14 +144,14 @@ class Bird(pygame.sprite.Sprite):
             self.velHorizontal = -4
             self.fitness -= 20
 
-    def checkNewPoint(self, rectPipeTop, rectPipeBot, window):
+    def checkNewPoint(self, pipesTop_List, pipesBottom_List, actualPipe, window):
 
-        if showGrades:
-            pygame.draw.line(window, (255, 0, 255), self.rect.center, rectPipeBot.midtop)
-            pygame.draw.line(window, (255, 150, 0), self.rect.center, rectPipeTop.midbottom)
+        if showGrades1:
+            pygame.draw.line(window, (255, 0, 255), self.rect.center, pipesBottom_List[actualPipe].rect.midtop)
+            pygame.draw.line(window, (255, 150, 0), self.rect.center, pipesTop_List[actualPipe].rect.midbottom)
 
         # Avalia se o retangulo do passaro está em contato com o retangulo de score
-        if self.rect.clipline(rectPipeTop.bottomright, rectPipeBot.topright):
+        if self.rect.clipline(pipesTop_List[actualPipe].rect.bottomright, pipesBottom_List[actualPipe].rect.topright):
             if not self.bird_earned_point:
                 self.pts += 1
                 self.bird_earned_point = True
@@ -167,17 +168,9 @@ class Bird(pygame.sprite.Sprite):
                 self.distBottom = (pipesBottom_List[actualPipe].rect.top - self.rect.centery)
                 self.distXToPipes = (pipesBottom_List[actualPipe].rect.left - self.rect.centerx)
                 self.distHole = (pipesBottom_List[actualPipe].rect.centerx - self.rect.centerx)
-                if len(pipesTop_List) > 1:
-                    self.distTopSecondPipe = (pipesTop_List[actualPipe + 1].rect.bottom - self.rect.centery)
-                    self.distBottomSecondPipe = (pipesBottom_List[actualPipe + 1].rect.top - self.rect.centery)
-                    self.distXToPipesSecondPipe = (pipesBottom_List[actualPipe + 1].rect.left - self.rect.centerx)
-                else:
-                    self.distTopSecondPipe = 0
-                    self.distBottomSecondPipe = 0
-                    self.distXToPipesSecondPipe = 1280
 
             # Checa a pontuacao
-            self.checkNewPoint(pipesTop_List[actualPipe].rect, pipesBottom_List[actualPipe].rect, window)
+            self.checkNewPoint(pipesTop_List, pipesBottom_List, actualPipe, window)
 
 
 class Text:
@@ -222,8 +215,8 @@ class Button:
 
     def handle_event(self, event):
         if event.type == pygame.MOUSEBUTTONDOWN and self.rect.collidepoint(event.pos):
-            global showGrades
-            showGrades = not showGrades
+            global showGrades1
+            showGrades1 = not showGrades1
             self.pressed = not self.pressed
 
 

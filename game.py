@@ -2,8 +2,12 @@ from operator import attrgetter
 import random
 import pygame
 import numpy as np
+import configparser
 from ia import LayerDense, ActivationReLu
 from obj import Obj, Pipe, Bird, Text, Chart, Button
+
+config = configparser.ConfigParser()
+config.read('config.properties')
 
 
 class Game:
@@ -11,7 +15,7 @@ class Game:
     def __init__(self):
 
         self.window = 0
-        self.tam_population = 70
+        self.tam_population = int(config.get('geracoes', 'population'))
         self.generation = 0
         self.best_score = 0
         self.score = 0
@@ -42,7 +46,7 @@ class Game:
         self.text_best_score.draw(window, 10, 610)
         self.text_score_hist.draw(window, 500, 610)
         self.graph.draw(window)
-        self.button.draw(window)
+        self.button_grades1.draw(window)
 
     def validate_population_alive(self):
         for bird in self.population:
@@ -107,7 +111,7 @@ class Game:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
-            self.button.handle_event(event)
+            self.button_grades1.handle_event(event)
 
     def start_game(self, listOfBirds):
         self.generation += 1
@@ -128,7 +132,7 @@ class Game:
         self.ground4 = Obj("assets/ground.png", 1080, 480, self.ground_group)
         self.ground5 = Obj("assets/ground.png", 1440, 480, self.ground_group)
 
-        self.button = Button(900, 525, 150, 50, "GRADES")
+        self.button_grades1 = Button(900, 525, 150, 50, "GRADES")
 
         # Reseta a populacao
         new_population = []
@@ -205,7 +209,7 @@ class Game:
                     self.pipes_bottom_list.pop(i)
 
         # de 1,5 seggundo em segundo
-        if self.ticks >= 60:
+        if self.ticks >= int(config.get('pygame', 'pipespaw')):
             self.ticks = 0
             self.create_pipe()
 

@@ -1,5 +1,9 @@
 import pygame
+import configparser
 from game import Game
+
+config = configparser.ConfigParser()
+config.read('config.properties')
 
 
 class Main:
@@ -32,7 +36,7 @@ class Main:
     def update(self):
         """Realiza o update do pygame de acordo com o fps definido"""
         while self.loop:
-            self.fps.tick(30)
+            self.fps.tick(int(config.get('pygame', 'fps')))
             self.events()
             self.draw()
             pygame.display.update()

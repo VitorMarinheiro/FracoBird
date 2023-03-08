@@ -16,10 +16,10 @@ class LayerDense:
             rand = random.randint(0, 3)
             if rand == 0:
                 # Soma Aleatoria
-                self.weights[i] += random.uniform(-0.1, 0.1)
+                self.weights[i] += random.uniform(-0.2, 0.2)
             elif rand == 1:
                 # Multiplicacao Aleatoria
-                self.weights[i] *= random.uniform(0.9, 1.1)
+                self.weights[i] *= random.uniform(0.8, 1.2)
 
     def forward(self, inputs):
         self.output = np.dot(inputs, self.weights) + self.biases
